@@ -16,11 +16,14 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.ajoberstar.grgit' version '4.0.1'
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
-def buildNumber = System.getenv("BUILD_NUMBER") != null ? System.getenv("BUILD_NUMBER").toInteger() : 10000
-def libraryVersionName = sprintf("0.8.0", buildNumber)
+def libraryVersionName = "0.0.1-${grgit.head().getAbbreviatedId()}"
 
 android {
     compileSdkVersion 29
@@ -29,7 +32,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode buildNumber
+        versionCode grgit.log().size()
         versionName libraryVersionName
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -104,4 +107,17 @@ dependencies {
 task sourceJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier "sources"
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            libraryAar(MavenPublication) {
+                from components.library
+                groupId 'com.mc10inc.biostamp'
+                version = libraryVersionName
+                artifactId project.getName()
+            }
+        }
+    }
 }
