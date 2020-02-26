@@ -117,6 +117,7 @@ afterEvaluate {
                 groupId 'com.mc10inc.biostamp'
                 version = libraryVersionName
                 artifactId project.getName()
+                artifact sourceJar
             }
         }
     }
