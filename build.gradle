@@ -111,6 +111,16 @@ task sourceJar(type: Jar) {
 
 afterEvaluate {
     publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/mc10inc/bitgatt")
+                credentials {
+                    username = project.findProperty("gpr.user")
+                    password = project.findProperty("gpr.key")
+                }
+            }
+        }
         publications {
             libraryAar(MavenPublication) {
                 from components.library
