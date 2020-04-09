@@ -11,6 +11,7 @@ package com.fitbit.bluetooth.fbgatt;
 import com.fitbit.bluetooth.fbgatt.tx.mocks.NotifyGattServerCharacteristicMockTransaction;
 import com.fitbit.bluetooth.fbgatt.tx.mocks.SubscribeToCharacteristicNotificationsMockTransaction;
 import com.fitbit.bluetooth.fbgatt.tx.mocks.UnSubscribeToGattCharacteristicNotificationsMockTransaction;
+import com.fitbit.bluetooth.fbgatt.util.LooperWatchdog;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -41,7 +42,6 @@ public class GattNotifyIndicateTests {
         Context ctx = mock(Context.class);
         Looper looper = mock(Looper.class);
         when(ctx.getApplicationContext()).thenReturn(ctx);
-        FitbitGatt.getInstance().start(ctx);
         Handler mockHandler = mock(Handler.class);
         Looper mockLooper = mock(Looper.class);
         Thread mockThread = mock(Thread.class);
@@ -68,7 +68,9 @@ public class GattNotifyIndicateTests {
         when(serverConnection.getMainHandler()).thenReturn(mockHandler);
         conn.setState(GattState.IDLE);
         serverConnection.setState(GattState.IDLE);
-        FitbitGatt.getInstance().setGattServer(serverConnection);
+        FitbitGatt.getInstance().setAsyncOperationThreadWatchdog(mock(LooperWatchdog.class));
+        FitbitGatt.getInstance().startGattServer(ctx);
+        FitbitGatt.getInstance().setGattServerConnection(serverConnection);
     }
 
     @Test

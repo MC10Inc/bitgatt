@@ -8,14 +8,6 @@
 
 package com.fitbit.bluetooth.fbgatt;
 
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-
 import com.fitbit.bluetooth.fbgatt.tx.CreateBondTransaction;
 import com.fitbit.bluetooth.fbgatt.tx.ReadGattCharacteristicTransaction;
 import com.fitbit.bluetooth.fbgatt.tx.ReadGattDescriptorTransaction;
@@ -31,7 +23,17 @@ import com.fitbit.bluetooth.fbgatt.tx.mocks.WriteGattCharacteristicMockTransacti
 import com.fitbit.bluetooth.fbgatt.tx.mocks.WriteGattDescriptorMockTransaction;
 import com.fitbit.bluetooth.fbgatt.util.GattStatus;
 import com.fitbit.bluetooth.fbgatt.util.GattUtils;
+import com.fitbit.bluetooth.fbgatt.util.LooperWatchdog;
 
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +61,6 @@ public class GattReadWriteTests {
     public void before() {
         Context ctx = mock(Context.class);
         when(ctx.getApplicationContext()).thenReturn(ctx);
-        FitbitGatt.getInstance().start(ctx);
         Handler mockHandler = mock(Handler.class);
         Looper mockLooper = mock(Looper.class);
         Thread mockThread = mock(Thread.class);
@@ -80,8 +81,16 @@ public class GattReadWriteTests {
         conn = spy(new GattConnection(device, mockLooper));
         conn.setMockMode(true);
         when(conn.getMainHandler()).thenReturn(mockHandler);
+        FitbitGatt.getInstance().setAsyncOperationThreadWatchdog(mock(LooperWatchdog.class));
+        FitbitGatt.getInstance().startGattClient(ctx);
         FitbitGatt.getInstance().putConnectionIntoDevices(device, conn);
         conn.setState(GattState.IDLE);
+    }
+
+    @After
+    public void after() {
+        FitbitGatt.getInstance().shutdown();
+        FitbitGatt.setInstance(null);
     }
 
     @Test
