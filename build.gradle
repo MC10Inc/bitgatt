@@ -23,7 +23,7 @@ plugins {
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
-def libraryVersionName = "0.0.1-${grgit.head().getAbbreviatedId()}"
+def libraryVersionName = "0.0.2-${grgit.head().getAbbreviatedId()}"
 
 android {
     compileSdkVersion 29
